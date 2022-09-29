@@ -42,9 +42,14 @@ function Login() {
       }),
     });
     const json = await response.json();
+    const name=json.reuser
     if (json.success) {
       localStorage.setItem("token", json.authtoken);
-      navigate("/home");
+        navigate("/home", {
+          state: {
+              name
+          },
+        });
         toast.success("Logged in Successfully")
     }else {
         toast.error("Please Try again")
