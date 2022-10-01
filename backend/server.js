@@ -21,103 +21,54 @@ var server=app.listen(port, () => {
 })
 
 var io = socket(server); 
-
-// const userSocketMap = {};
-// function getAllConnectedClients(roomId) {
-//     // Map
-//     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
-//         (socketId) => {
-//             return {
-//                 socketId,
-//                 username: userSocketMap[socketId],
-//             };
-//         }
-//     );
-// }
-
-// io.on('connection', (socket) => {
-//     console.log('socket connected', socket.id);
-
-//     socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
-//         userSocketMap[socket.id] = username;
-//         socket.join(roomId);
-//         const clients = getAllConnectedClients(roomId);
-//         clients.forEach(({ socketId }) => {
-//             io.to(socketId).emit(ACTIONS.JOINED, {
-//                 clients,
-//                 username,
-//                 socketId: socket.id,
-//             });
-//         });
-//     });
-
-//     socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
-//         socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
-//     });
-
-//     socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-//         io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
-//     });
-
-//     socket.on('disconnecting', () => {
-//         const rooms = [...socket.rooms];
-//         rooms.forEach((roomId) => {
-//             socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
-//                 socketId: socket.id,
-//                 username: userSocketMap[socket.id],
-//             });
-//         });
-//         delete userSocketMap[socket.id];
-//         socket.leave();
-//     });
-// });
-
-const userSocketMap = {};
-// var prevdata;
 var prevdata;
+const userSocketMap = {};
 function getAllConnectedClients(roomId) {
-  // Map
-  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
-      (socketId) => {
-          return {
-              socketId,
-              username: userSocketMap[socketId],
-          };
-      }
-  );
+    // Map
+    return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+        (socketId) => {
+            return {
+                socketId,
+                username: userSocketMap[socketId],
+            };
+        }
+    );
 }
-    
+
+
 io.on('connection', (socket) => {
-    socket.on('join', (room,username) => {
-      console.log('room', room)
-      
-      userSocketMap[socket.id] = username;
-      socket.join(room)
-      const clients = getAllConnectedClients(room);
+    // console.log('New client connected')
+    socket.on('join', ({ roomId, username }) => {
+        userSocketMap[socket.id] = username;
+        socket.join(roomId);
+        io.to(socket.id).emit('sync', {
+            prevdata
+        });
+        const clients = getAllConnectedClients(roomId);
         clients.forEach(({ socketId }) => {
             io.to(socketId).emit('joined', {
                 clients,
                 username,
-                socketId:socket.id,
+                socketId: socket.id,
             });
-            io.to(socketId).emit('new-join-sync',prevdata);
         });
     });
-
-//Here we listen on a new namespace called "incoming data"
+ 
     socket.on('data', (data) => {
-        //Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data
-        console.log("initial wala sync")
+      prevdata=data;
         console.log('data', data)
-        prevdata=data;
-        socket.in(data.room).emit('data', { data: data })
+      socket.to(data.room).emit('data', { data: data })
+    })
+    socket.on('disconnecting', () => {
+        const rooms = [...socket.rooms];
+        rooms.forEach((roomId) => {
+            socket.in(roomId).emit('disconnected', {
+                socketId: socket.id,
+                username: userSocketMap[socket.id],
+            });
+        });
+        delete userSocketMap[socket.id];
+        socket.leave();
     });
-
-
     
-    
-  
-    //A special namespace "disconnect" for when a client disconnects
-    socket.on('disconnect', () => console.log('Client disconnected'));
 })
-  

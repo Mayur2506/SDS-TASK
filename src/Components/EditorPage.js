@@ -26,6 +26,9 @@ import 'ace-builds/src-noconflict/snippets/golang'
 import 'ace-builds/src-noconflict/snippets/php'
 import io from 'socket.io-client'
 import toast from 'react-hot-toast'
+import "./Editor.css"
+import Client from './Client'
+import { paste } from '@testing-library/user-event/dist/paste'
 // import {initSocket} from "./socket"
 
 
@@ -36,6 +39,7 @@ const Editor = () => {
 
   const location=useLocation();
   const rusername=location.state?.username;
+  // alert(rusername)
   const options = {
         'force new connection': true,
         reconnectionAttempt: 'Infinity',
@@ -48,24 +52,64 @@ const Editor = () => {
   const [state, setState] = useState({
     text: '',
     langauge: '54',
-    theme: 'terminal',
+    theme: 'monokai',
     input: '',
     output: '',
   })
-  
   //const [text, setText] = useState('')
-  useEffect(() => {
-    console.log('====================================');
-    console.log("sending request");
-    console.log('====================================');
-    client.emit('join', roomId,rusername)  
+  // useEffect(() => {
+  //   console.log('====================================');
+  //   console.log("sending request");
+  //   console.log('====================================');
+  //   client.emit('join', roomId,rusername)  
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
-    client.on('new-join-sync',(prevdata)=>{
-      // const h=prevdata.
-      const data = { room: prevdata.room, data: prevdata.data }
-      // console.log("this is prevdata",prevdata)
-      client.emit('data', data)
-    })
+  // useEffect(() => {
+  //   // console.log('here')
+  //   client.on('new-join-sync',(prevdata)=>{
+  //     // const h=prevdata.
+  //     const data = { room: prevdata.room, data: prevdata.data }
+  //     // console.log("this is prevdata",prevdata)
+  //     client.emit('data', data)
+  //   })
+  //   client.on('data', (newState) => {
+  //     // console.log('data', newState)
+  //     // console.log('incoming-text', newState.data.data)
+  //     if (newState.data.data.text !== ' ') setState(newState.data.data)
+  //   })
+  //   client.on('disconnect',(socketId,username)=>{
+  //     setClients((prev) => {
+  //         return prev.filter(
+  //             (client) => client.socketId !== socketId
+  //         );
+  //     });
+  //   });
+  //   client.on(
+  //     'joined',
+  //     ({ clients, username, socketId }) => {
+  //         if (username !== rusername) {
+  //             toast.success(`${username} joined the room.`);
+  //             console.log(`${username} joined`);
+  //         }
+  //         console.log('====================================');
+  //         console.log(clients);
+  //         console.log('====================================');
+  //         setClients(clients);
+  //         console.log("The one joined has",socketId);
+  //     }
+  //   );
+  // })
+
+
+  useEffect(() => {
+    client.emit('join', {
+      roomId,
+      username:rusername,
+    });
+    // const data = { room: room.id, data: state }
+    // console.log('own-data', data)
+    // client.emit('data', data)
     client.on(
       'joined',
       ({ clients, username, socketId }) => {
@@ -73,30 +117,36 @@ const Editor = () => {
               toast.success(`${username} joined the room.`);
               console.log(`${username} joined`);
           }
-          console.log('====================================');
-          console.log(clients);
-          console.log('====================================');
           setClients(clients);
-          console.log("The one joined has",socketId);
-          // client.emit('sync-code', {
-          //     code: state,
-          //     socketId,
-          // });
       }
-  );
-    // const data = { room: room.id, data: state }
-    // console.log('own-data', data)
-    // client.emit('data', data)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    );
+    client.on('sync',(prevdata)=>{
+      console.log("logging here",prevdata.prevdata.room);
+      setState(prevdata.prevdata.data);
+    })
+
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    // console.log('here')
+    console.log('here')
     client.on('data', (newState) => {
-      // console.log('data', newState)
-      // console.log('incoming-text', newState.data.data)
+      console.log('data', newState)
+      console.log('incoming-text', newState.data.data)
       if (newState.data.data.text !== ' ') setState(newState.data.data)
     })
+    client.on(
+      'disconnected',
+      ({ socketId, username }) => {
+          toast.success(`${username} left the room.`);
+          setClients((prev) => {
+              return prev.filter(
+                  (client) => client.socketId !== socketId
+              );
+          });
+      }
+    );
+    
   })
+  
   const handleChange = (text) => {
     
     // console.log('text', text)
@@ -288,6 +338,35 @@ const Editor = () => {
   map1.set(68, 'php')
   return (
     <div className='compiler'>
+      <div className='initiate'>
+        <span>Language :  </span>
+        <select
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          className='langauges'
+          value={state.langauge}
+        >
+          <option value='54'>C++</option>
+          <option value='71'>python</option>
+          <option value='62'>java</option>
+          <option value='60'>golang</option>
+          <option value='63'>javascript</option>
+          <option value='68'>PHP</option>
+        </select>
+        <span> Theme :  </span>
+        <select
+          onChange={(e) => handleThemeChange(e.target.value)}
+          className='themes'
+          value={state.theme}
+        >
+          <option value='terminal'>terminal</option>
+          <option value='monokai'>monokai</option>
+          <option value='xcode'>xcode</option>
+          <option value='github'>github</option>
+          <option value='solarized_dark'>solarized_dark</option>
+          <option value='tomorrow'>tomorrow</option>
+        </select>
+      </div>
+      <div className='makeflex'>
       <AceEditor
         mode={map1.get(parseInt(state.langauge))}
         theme={state.theme}
@@ -298,16 +377,10 @@ const Editor = () => {
           showLineNumbers: true,
           tabSize: 2,
           behavioursEnabled: true,
-          displayIndentGuides: true, 
-          showInvisibles: true,
+          displayIndentGuides: true,
         }}
         className='editor'
         highlightActiveLine={true}
-        // options={{
-        //   placeholder: {
-        //     text: state.text ? contentDefaultMessage : '',
-        //   },
-        // }}
         commands={[
           Beautify.commands,
           {
@@ -339,8 +412,8 @@ const Editor = () => {
         name='UNIQUE_ID_OF_DIV'
         editorProps={{ $blockScrolling: false }}
         style={{
-          height: 700,
-          width: 800,
+          height: 600,
+          width: 750,
           display: 'flex',
           justifyContent: 'center',
           font: 50,
@@ -349,73 +422,50 @@ const Editor = () => {
         value={state.text}
         onChange={handleChange}
       />
-      <div>
-        <select
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          className='langauges'
-          value={state.langauge}
-        >
-          <option value='54'>C++</option>
-          <option value='71'>python</option>
-          <option value='62'>java</option>
-          <option value='60'>golang</option>
-          <option value='63'>javascript</option>
-          <option value='68'>PHP</option>
-        </select>
-        <select
-          onChange={(e) => handleThemeChange(e.target.value)}
-          className='themes'
-          value={state.theme}
-        >
-          <option value='terminal'>terminal</option>
-          <option value='monokai'>monokai</option>
-          <option value='xcode'>xcode</option>
-          <option value='github'>github</option>
-          <option value='solarized_dark'>solarized_dark</option>
-          <option value='tomorrow'>tomorrow</option>
-        </select>
-      </div>
-      <div>
-        <div className='mt-2 ml-5'>
-          <span
-            className='badge badge-primary heading my-2 '
-            style={{ color: 'black' }}
-          >
-            <i className='fas fa-user fa-fw fa-md' style={{ color: 'black' }} />{' '}
-            User Input
+        <div>
+        <div className='flex1'>
+          <span>
+            User Input :
           </span>
           <br />
           <textarea
             value={state.input}
             id='input1'
-            style={{ height: 150, width: 250, marginTop: 25 }}
+            className='textareas'
             onChange={(e) => handleUserInput(e.target.value)}
           />
         </div>
         <div className='mt-2 ml-5'>
-          <span
-            className='badge badge-primary heading my-2'
-            style={{ color: 'black' }}
-          >
-            <i className='fas fa-user fa-fw fa-md'> Output</i>
+          <span>
+            Output :
           </span>
           <br />
           <textarea
             value={state.output}
             id='output1'
-            style={{ height: 330, width: 438, marginTop: 25 }}
+            className='textareas'
             onChange={(e) => handleCodeOutput(e.target.value)}
           />
         </div>
+            <button
+            style={{ height: 50, width: 100,marginTop: 25}}
+            type='submit'
+            className='btn1'
+            onClick={(e) => onsubmit(e)}
+            >
+            Submit
+            </button>
       </div>
-      <button
-        style={{ height: 50, width: 100, marginRight: 100, marginTop: 25 }}
-        type='submit'
-        className='btn1'
-        onClick={(e) => onsubmit(e)}
-      >
-        Submit
-      </button>
+      <div>
+        <p>users :</p>
+        {clients.map((client) => (
+            <Client
+                key={client.socketId}
+                username={client.username}
+            />
+        ))}
+      </div>
+      </div>
     </div>
   )
 }

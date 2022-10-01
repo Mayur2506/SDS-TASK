@@ -10,8 +10,8 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userf=location.state?.name
-  const [roomId, setRoomId] = useState(userf);
-  const [username, setUsername] = useState('');
+  const [roomId, setRoomId] = useState('');
+  const [username, setUsername] = useState(userf);
   const createNewRoom = (e) => {
       e.preventDefault();
       const id = uuidV4();

@@ -1,0 +1,15 @@
+.initiate{
+    margin-left: 10rem;
+}
+
+.makeflex{
+    display: flex;
+    flex-direction: row;
+}
+
+
+.textareas{
+    height: 7.5rem;
+    width: 13rem;
+    margin-top: 2rem;
+}
