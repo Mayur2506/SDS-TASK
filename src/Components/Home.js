@@ -1,6 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown'
 import {useLocation} from "react-router-dom"
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidV4 } from 'uuid';
@@ -9,7 +7,6 @@ import toast from "react-hot-toast"
 
 
 const Home = () => {
-  const [value,setvalue]=useState('languages')
   const navigate = useNavigate();
   const location = useLocation();
   const userf=location.state?.name
@@ -21,9 +18,6 @@ const Home = () => {
       setRoomId(id);
       toast.success('Created a new room');
   };
-  const handleSelect = (e) => {
-      setvalue(e)
-  };
   const joinRoom = () => {
       if (!roomId || !username) {
           toast.error('ROOM ID & username is required');
@@ -34,7 +28,6 @@ const Home = () => {
       navigate(`/editor/${roomId}`, {
           state: {
               username,
-              value
           },
       });
   };
@@ -79,17 +72,6 @@ const Home = () => {
                           new room
                       </button>
                   </span>
-                  <DropdownButton
-                    alignRight
-                    title={value}
-                    id="dropdown-menu-align-right"
-                    onSelect={handleSelect}
-                  >
-                  <Dropdown.Item eventKey="C">C</Dropdown.Item>
-                  <Dropdown.Item eventKey="C++">C++</Dropdown.Item>
-                  <Dropdown.Item eventKey="JAVA">JAVA</Dropdown.Item>
-                  <Dropdown.Item eventKey="PYTHON">PYTHON</Dropdown.Item>
-                </DropdownButton>
 
               </div>
           </div>

@@ -1,6 +1,6 @@
 import AceEditor from 'react-ace'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams,useLocation } from 'react-router-dom'
 import Beautify from 'ace-builds/src-noconflict/ext-beautify'
 import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite'
 import 'ace-builds/src-noconflict/ext-error_marker'
@@ -25,7 +25,7 @@ import 'ace-builds/src-noconflict/snippets/javascript'
 import 'ace-builds/src-noconflict/snippets/golang'
 import 'ace-builds/src-noconflict/snippets/php'
 import io from 'socket.io-client'
-
+import toast from 'react-hot-toast'
 // import {initSocket} from "./socket"
 
 
@@ -34,6 +34,8 @@ import io from 'socket.io-client'
 
 const Editor = () => {
 
+  const location=useLocation();
+  const rusername=location.state?.username;
   const options = {
         'force new connection': true,
         reconnectionAttempt: 'Infinity',
@@ -41,6 +43,7 @@ const Editor = () => {
         transports: ['websocket'],
   };
   const client= io("http://localhost:5000", options);
+  const [clients, setClients] = useState([]);
   const { roomId } = useParams();
   const [state, setState] = useState({
     text: '',
@@ -49,29 +52,56 @@ const Editor = () => {
     input: '',
     output: '',
   })
+  
   //const [text, setText] = useState('')
   useEffect(() => {
     console.log('====================================');
     console.log("sending request");
     console.log('====================================');
-    client.emit('join', roomId)   
+    client.emit('join', roomId,rusername)  
 
+    client.on('new-join-sync',(prevdata)=>{
+      // const h=prevdata.
+      const data = { room: prevdata.room, data: prevdata.data }
+      // console.log("this is prevdata",prevdata)
+      client.emit('data', data)
+    })
+    client.on(
+      'joined',
+      ({ clients, username, socketId }) => {
+          if (username !== rusername) {
+              toast.success(`${username} joined the room.`);
+              console.log(`${username} joined`);
+          }
+          console.log('====================================');
+          console.log(clients);
+          console.log('====================================');
+          setClients(clients);
+          console.log("The one joined has",socketId);
+          // client.emit('sync-code', {
+          //     code: state,
+          //     socketId,
+          // });
+      }
+  );
     // const data = { room: room.id, data: state }
     // console.log('own-data', data)
     // client.emit('data', data)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    console.log('here')
+    // console.log('here')
     client.on('data', (newState) => {
-      console.log('data', newState)
-      console.log('incoming-text', newState.data.data)
+      // console.log('data', newState)
+      // console.log('incoming-text', newState.data.data)
       if (newState.data.data.text !== ' ') setState(newState.data.data)
     })
   })
   const handleChange = (text) => {
-    console.log('text', text)
+    
+    // console.log('text', text)
     //const editorInput = text
+   
     const newState = {
       text: text,
       langauge: state.langauge,
@@ -79,13 +109,17 @@ const Editor = () => {
       input: state.input,
       output: state.output,
     }
-
-    console.log('state', state)
+    setState(newState)
+    // console.log('state', state)
     const data = { room: roomId, data: newState }
+    console.log('====================================');
+    console.log("test re",data);
+    console.log('====================================');
     //console.log('data', data)
     // console.log('own-data', data)
+    
     client.emit('data', data)
-    setState(newState)
+    
   }
   const handleLanguageChange = (langauge) => {
     const newState = {

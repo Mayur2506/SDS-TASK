@@ -72,19 +72,50 @@ var io = socket(server);
 //     });
 // });
 
+const userSocketMap = {};
+// var prevdata;
+var prevdata;
+function getAllConnectedClients(roomId) {
+  // Map
+  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+      (socketId) => {
+          return {
+              socketId,
+              username: userSocketMap[socketId],
+          };
+      }
+  );
+}
+    
 io.on('connection', (socket) => {
-    console.log('New client connected')
-    socket.on('join', (room) => {
+    socket.on('join', (room,username) => {
       console.log('room', room)
+      
+      userSocketMap[socket.id] = username;
       socket.join(room)
+      const clients = getAllConnectedClients(room);
+        clients.forEach(({ socketId }) => {
+            io.to(socketId).emit('joined', {
+                clients,
+                username,
+                socketId:socket.id,
+            });
+            io.to(socketId).emit('new-join-sync',prevdata);
+        });
     });
-  
-    //Here we listen on a new namespace called "incoming data"
+
+//Here we listen on a new namespace called "incoming data"
     socket.on('data', (data) => {
-      //Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data
-      console.log('data', data)
-      socket.to(data.room).emit('data', { data: data })
+        //Here we broadcast it out to all other sockets EXCLUDING the socket which sent us the data
+        console.log("initial wala sync")
+        console.log('data', data)
+        prevdata=data;
+        socket.in(data.room).emit('data', { data: data })
     });
+
+
+    
+    
   
     //A special namespace "disconnect" for when a client disconnects
     socket.on('disconnect', () => console.log('Client disconnected'));
