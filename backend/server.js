@@ -41,24 +41,30 @@ io.on('connection', (socket) => {
     socket.on('join', ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
-        io.to(socket.id).emit('sync', {
-            prevdata
-        });
+        // io.to(socket.id).emit('sync', {
+        //     prevdata
+        // });
         const clients = getAllConnectedClients(roomId);
         clients.forEach(({ socketId }) => {
             io.to(socketId).emit('joined', {
                 clients,
                 username,
-                socketId: socket.id,
+                prevdata,
             });
         });
     });
  
     socket.on('data', (data) => {
-      prevdata=data;
+        prevdata=data;
         console.log('data', data)
-      socket.to(data.room).emit('data', { data: data })
+        socket.to(data.room).emit('data', { data: data })
     })
+    // socket.on('sync', ({ socketId, code,roomId }) => {
+        
+    //     const data = { room: roomId, data: code }
+    //     console.log("sync",data);
+    //     io.to(socketId).emit('data',data);
+    // });
     socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];
         rooms.forEach((roomId) => {

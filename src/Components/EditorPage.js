@@ -28,11 +28,7 @@ import io from 'socket.io-client'
 import toast from 'react-hot-toast'
 import "./Editor.css"
 import Client from './Client'
-import { paste } from '@testing-library/user-event/dist/paste'
-// import {initSocket} from "./socket"
-
-
-// const client = initSocket()// import './App.css'
+import Navbar from "./Navbar"
 
 
 const Editor = () => {
@@ -112,19 +108,21 @@ const Editor = () => {
     // client.emit('data', data)
     client.on(
       'joined',
-      ({ clients, username, socketId }) => {
+      ({ clients, username, prevdata }) => {
           if (username !== rusername) {
               toast.success(`${username} joined the room.`);
               console.log(`${username} joined`);
           }
           setClients(clients);
+          if(prevdata !== undefined){
+            setState(prevdata.data);
+          }
+          //     code:state,
+          //     socketId,
+          //     roomId
+          // });
       }
     );
-    client.on('sync',(prevdata)=>{
-      console.log("logging here",prevdata.prevdata.room);
-      setState(prevdata.prevdata.data);
-    })
-
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log('here')
@@ -144,6 +142,14 @@ const Editor = () => {
           });
       }
     );
+    // client.on(
+    //   'sync',
+    //   ({prevdata}) => {
+    //       console.log("previous one",prevdata);
+    //       console.log("previous data is",prevdata.data);
+    //       // setState(prevdata.data)
+    //   }
+    // );
     
   })
   
@@ -390,12 +396,6 @@ const Editor = () => {
             exec: 'removeline',
           },
           {
-           
-            name: 'copyline', 
-            bindKey: { win: 'Ctrl-C', mac: 'Command-C' }, 
-            exec: 'copyline',
-          },
-          {
             
             name: 'copyline',
             bindKey: { win: 'Ctrl-C', mac: 'Command-C' },
@@ -422,7 +422,7 @@ const Editor = () => {
         value={state.text}
         onChange={handleChange}
       />
-        <div>
+        <div className='editinput'>
         <div className='flex1'>
           <span>
             User Input :
@@ -456,14 +456,16 @@ const Editor = () => {
             Submit
             </button>
       </div>
-      <div>
+      <div className='users'>
         <p>users :</p>
+        <div className='userflex'>
         {clients.map((client) => (
             <Client
                 key={client.socketId}
                 username={client.username}
             />
         ))}
+        </div>
       </div>
       </div>
     </div>

@@ -14,7 +14,7 @@ import {
 from 'mdb-react-ui-kit';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 import toast from 'react-hot-toast';
-
+import Navbar from "./Navbar"
 
 function Login() {
    
@@ -88,64 +88,66 @@ function Login() {
   };
 
   return (
-    <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
+    <div>
+        <Navbar/>
+        <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
 
-      <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
-        <MDBTabsItem>
-          <MDBTabsLink onClick={() => handleJustifyClick('tab1')} active={justifyActive === 'tab1'}>
-            Login
-          </MDBTabsLink>
-        </MDBTabsItem>
-        <MDBTabsItem>
-          <MDBTabsLink onClick={() => handleJustifyClick('tab2')} active={justifyActive === 'tab2'}>
-            Register
-          </MDBTabsLink>
-        </MDBTabsItem>
-      </MDBTabs>
+          <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
+            <MDBTabsItem>
+              <MDBTabsLink onClick={() => handleJustifyClick('tab1')} active={justifyActive === 'tab1'}>
+                Login
+              </MDBTabsLink>
+            </MDBTabsItem>
+            <MDBTabsItem>
+              <MDBTabsLink onClick={() => handleJustifyClick('tab2')} active={justifyActive === 'tab2'}>
+                Register
+              </MDBTabsLink>
+            </MDBTabsItem>
+          </MDBTabs>
 
-      <MDBTabsContent>
+          <MDBTabsContent>
 
-        <MDBTabsPane show={justifyActive === 'tab1'}>
+            <MDBTabsPane show={justifyActive === 'tab1'}>
 
-          <div className="text-center mb-3">
-            <p>Sign in with:</p>
+              <div className="text-center mb-3">
+                <p>Sign in with:</p>
 
-          </div>
+              </div>
 
-          <MDBInput wrapperClass='mb-4' name="email" label='Email address'   value={logincredentials.email} id='form1' type='email' onChange={onChange}/>
-          <MDBInput wrapperClass='mb-4' name="password" label='Password'  value={logincredentials.password} id='form2' type='password' onChange={onChange}/>
+              <MDBInput wrapperClass='mb-4' name="email" label='Email address'   value={logincredentials.email} id='form1' type='email' onChange={onChange}/>
+              <MDBInput wrapperClass='mb-4' name="password" label='Password'  value={logincredentials.password} id='form2' type='password' onChange={onChange}/>
 
-          <div className="d-flex justify-content-between mx-4 mb-4">
-            <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember me' />
-            <a href="!#">Forgot password?</a>
-          </div>
+              <div className="d-flex justify-content-between mx-4 mb-4">
+                <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember me' />
+              </div>
 
-          <MDBBtn className="mb-4 w-100" onClick={handleSubmit} >Sign in</MDBBtn>
-        </MDBTabsPane>
+              <MDBBtn className="mb-4 w-100" onClick={handleSubmit} >Sign in</MDBBtn>
+            </MDBTabsPane>
 
-        <MDBTabsPane show={justifyActive === 'tab2'}>
+            <MDBTabsPane show={justifyActive === 'tab2'}>
 
-          <div className="text-center mb-3">
-            <p>Sign up with:</p>
+              <div className="text-center mb-3">
+                <p>Sign up with:</p>
 
-          </div>
+              </div>
 
-          <MDBInput wrapperClass='mb-4' name="name" label='Name' value={registercredentials.name} id='form1' type='text' onChange={onChanges} />
-          <MDBInput wrapperClass='mb-4' name="username" label='Username' value={registercredentials.username} id='form1' type='text' onChange={onChanges} />
-          <MDBInput wrapperClass='mb-4' name="email" label='Email' value={registercredentials.email} id='form1' type='email' onChange={onChanges} />
-          <MDBInput wrapperClass='mb-4'  name="password" label='Password' value={registercredentials.password} id='form1' type='password' onChange={onChanges}/>
+              <MDBInput wrapperClass='mb-4' name="name" label='Name' value={registercredentials.name} id='form1' type='text' onChange={onChanges} />
+              <MDBInput wrapperClass='mb-4' name="username" label='Username' value={registercredentials.username} id='form1' type='text' onChange={onChanges} />
+              <MDBInput wrapperClass='mb-4' name="email" label='Email' value={registercredentials.email} id='form1' type='email' onChange={onChanges} />
+              <MDBInput wrapperClass='mb-4'  name="password" label='Password' value={registercredentials.password} id='form1' type='password' onChange={onChanges}/>
 
-          <div className='d-flex justify-content-center mb-4'>
-            <MDBCheckbox name='flexCheck' id='flexCheckDefault' label='I have read and agree to the terms' />
-          </div>
+              <div className='d-flex justify-content-center mb-4'>
+                <MDBCheckbox name='flexCheck' id='flexCheckDefault' label='I have read and agree to the terms' />
+              </div>
 
-          <MDBBtn className="mb-4 w-100" onClick={handleReg}>Sign up</MDBBtn>
+              <MDBBtn className="mb-4 w-100" onClick={handleReg}>Sign up</MDBBtn>
 
-        </MDBTabsPane>
+            </MDBTabsPane>
 
-      </MDBTabsContent>
+          </MDBTabsContent>
 
-    </MDBContainer>
+        </MDBContainer>
+    </div>
   );
 }
 
