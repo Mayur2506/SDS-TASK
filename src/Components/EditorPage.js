@@ -1,5 +1,5 @@
 import AceEditor from 'react-ace'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState} from 'react'
 import { useParams,useLocation } from 'react-router-dom'
 import Beautify from 'ace-builds/src-noconflict/ext-beautify'
 import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite'
@@ -35,6 +35,7 @@ import Chat from "./Chat"
 const Editor = () => {
 
   const location=useLocation();
+  const token=localStorage.getItem("token");
   const rusername=location.state?.username;
   // alert(rusername)
   const options = {
@@ -43,7 +44,7 @@ const Editor = () => {
         timeout: 10000,
         transports: ['websocket'],
   };
-  const client= io("http://localhost:5000", options);
+  
   const [clients, setClients] = useState([]);
   const { roomId } = useParams();
   const [state, setState] = useState({
@@ -55,20 +56,21 @@ const Editor = () => {
     output: '',
   })
  
-
+  
  
-
+  const client= io("http://localhost:5000", options);; 
   useEffect(() => {
-    
     
       client.emit('join', {
         roomId,
         username:rusername,
+        token
       });
 
-      client.on(
+      client.off('joined').on(
         'joined',
         ({ clients, username, prevdata }) => {
+            
             if (username !== rusername) {
                 toast.success(`${username} joined the room.`);
                 console.log(`${username} joined`);
@@ -79,16 +81,18 @@ const Editor = () => {
             }
         }
       );
+      // return () => client.disconnect();
 
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
+     
     console.log('here')
     client.on('data', (newState) => {
       console.log('data', newState)
       console.log('incoming-text', newState.data.data)
       if (newState.data.data.text !== ' ') setState(newState.data.data)
     })
-    client.on(
+    client.off('disconnected').on(
       'disconnected',
       ({ socketId, username }) => {
           toast.success(`${username} left the room.`);

@@ -38,7 +38,8 @@ function getAllConnectedClients(roomId) {
 
 io.on('connection', (socket) => {
     // console.log('New client connected')
-    socket.on('join', ({ roomId, username }) => {
+    socket.on('join', ({ roomId, username,token }) => {
+        console.log("token")
         userSocketMap[socket.id] = username;
         socket.join(roomId);
         // io.to(socket.id).emit('sync', {
