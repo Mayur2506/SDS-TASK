@@ -54,51 +54,9 @@ const Editor = () => {
     input: '',
     output: '',
   })
-  //const [text, setText] = useState('')
-  // useEffect(() => {
-  //   console.log('====================================');
-  //   console.log("sending request");
-  //   console.log('====================================');
-  //   client.emit('join', roomId,rusername)  
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
+ 
 
-  // useEffect(() => {
-  //   // console.log('here')
-  //   client.on('new-join-sync',(prevdata)=>{
-  //     // const h=prevdata.
-  //     const data = { room: prevdata.room, data: prevdata.data }
-  //     // console.log("this is prevdata",prevdata)
-  //     client.emit('data', data)
-  //   })
-  //   client.on('data', (newState) => {
-  //     // console.log('data', newState)
-  //     // console.log('incoming-text', newState.data.data)
-  //     if (newState.data.data.text !== ' ') setState(newState.data.data)
-  //   })
-  //   client.on('disconnect',(socketId,username)=>{
-  //     setClients((prev) => {
-  //         return prev.filter(
-  //             (client) => client.socketId !== socketId
-  //         );
-  //     });
-  //   });
-  //   client.on(
-  //     'joined',
-  //     ({ clients, username, socketId }) => {
-  //         if (username !== rusername) {
-  //             toast.success(`${username} joined the room.`);
-  //             console.log(`${username} joined`);
-  //         }
-  //         console.log('====================================');
-  //         console.log(clients);
-  //         console.log('====================================');
-  //         setClients(clients);
-  //         console.log("The one joined has",socketId);
-  //     }
-  //   );
-  // })
-
+ 
 
   useEffect(() => {
     
@@ -107,9 +65,7 @@ const Editor = () => {
         roomId,
         username:rusername,
       });
-      // const data = { room: room.id, data: state }
-      // console.log('own-data', data)
-      // client.emit('data', data)
+
       client.on(
         'joined',
         ({ clients, username, prevdata }) => {
@@ -121,10 +77,6 @@ const Editor = () => {
             if(prevdata !== undefined){
               setState(prevdata.data);
             }
-            //     code:state,
-            //     socketId,
-            //     roomId
-            // });
         }
       );
 
@@ -147,15 +99,10 @@ const Editor = () => {
           });
       }
     );
-    
-    
   })
   
   const handleChange = (text) => {
     
-    // console.log('text', text)
-    //const editorInput = text
-   
     const newState = {
       text: text,
       font:state.font,
@@ -521,9 +468,8 @@ const Editor = () => {
         ))}
         </div>
           <div>
-          <Chat socket={client} username={rusername} room={roomId} />
-          </div>
-
+          <Chat socket={client} username={rusername} room={roomId} />  
+        </div>
       </div>
       </div>
     </div>
