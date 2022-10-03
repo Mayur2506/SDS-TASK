@@ -1,10 +1,11 @@
-
 const express = require('express')
 var cors = require('cors')
 const app = express()
 var socket = require('socket.io');
 app.use(cors())
 app.use(express.json());
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = "SDSTASK";
 
 const port = 5000
 const mongoose = require('mongoose');
@@ -40,19 +41,24 @@ io.on('connection', (socket) => {
     // console.log('New client connected')
     socket.on('join', ({ roomId, username,token }) => {
         console.log("token")
-        userSocketMap[socket.id] = username;
-        socket.join(roomId);
-        // io.to(socket.id).emit('sync', {
-        //     prevdata
-        // });
-        const clients = getAllConnectedClients(roomId);
-        clients.forEach(({ socketId }) => {
-            io.to(socketId).emit('joined', {
-                clients,
-                username,
-                prevdata,
-            });
-        });
+        jwt.verify(token,JWT_SECRET, function(err, decoded) {
+            if(err){
+                io.to(socket.id).emit('notauth');
+            }
+            else{
+                console.log("working")
+                userSocketMap[socket.id] = username;
+                socket.join(roomId);
+                const clients = getAllConnectedClients(roomId);
+                clients.forEach(({ socketId }) => {
+                    io.to(socketId).emit('joined', {
+                        clients,
+                        username,
+                        prevdata,
+                    });
+                });
+            }
+        });   
     });
  
     socket.on('data', (data) => {
@@ -71,6 +77,8 @@ io.on('connection', (socket) => {
     //     io.to(socketId).emit('data',data);
     // });
     socket.on('disconnecting', () => {
+        console.log("removing");
+        // io.to(socket.id).emit('dis');
         const rooms = [...socket.rooms];
         rooms.forEach((roomId) => {
             socket.in(roomId).emit('disconnected', {

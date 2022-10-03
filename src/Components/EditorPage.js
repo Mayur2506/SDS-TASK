@@ -1,6 +1,7 @@
 import AceEditor from 'react-ace'
 import React, { useEffect, useState} from 'react'
 import { useParams,useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import Beautify from 'ace-builds/src-noconflict/ext-beautify'
 import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite'
 import 'ace-builds/src-noconflict/ext-error_marker'
@@ -33,7 +34,7 @@ import Chat from "./Chat"
 
 
 const Editor = () => {
-
+  const navigate = useNavigate();
   const location=useLocation();
   const token=localStorage.getItem("token");
   const rusername=location.state?.username;
@@ -92,6 +93,11 @@ const Editor = () => {
       console.log('incoming-text', newState.data.data)
       if (newState.data.data.text !== ' ') setState(newState.data.data)
     })
+    client.on('notauth', () => {
+        toast.error("Please Login to Continue");
+        navigate('/');
+    })
+
     client.off('disconnected').on(
       'disconnected',
       ({ socketId, username }) => {
@@ -214,7 +220,10 @@ const Editor = () => {
     // console.log('own-data', data)
     client.emit('data', data)
   }
-
+  const removeToken = () => {
+    localStorage.removeItem("token");
+    navigate('/');
+  };
   onsubmit = async (e) => {
     console.log('state', state)
     e.preventDefault()
@@ -306,6 +315,7 @@ const Editor = () => {
       handleCodeOutput(outputText.value)
     }
   }
+
 
   let map1 = new Map()
 
@@ -460,6 +470,7 @@ const Editor = () => {
               onCopy={() => {toast.success("copied to clipboard")}}>
               <button>Copy RoomId</button>
             </CopyToClipboard>
+            <button className='bgq' onClick={removeToken}>Log Out</button>
         </div>
         <br></br>
         <p>users :</p>

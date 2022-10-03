@@ -3,6 +3,10 @@
     margin-left: 10rem;
 }
 
+.bgq{
+    margin-left: 1rem;
+}
+
 .makeflex{
     display: flex;
     flex-direction: row;
