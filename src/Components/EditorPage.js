@@ -337,7 +337,7 @@ const Editor = () => {
   return (
     <div className='compiler'>
       <div className='initiate'>
-      <span>fontSize :  </span>
+      <span className='inspan'>fontSize :  </span>
         <select
           onChange={(e) => handlefontChange(e.target.value)}
           className='fontchanges'
@@ -351,7 +351,7 @@ const Editor = () => {
           <option value='18'>18</option>
         </select>
         <span>  </span>
-        <span>Language :  </span>
+        <span className='inspan'>Language :  </span>
         <select
           onChange={(e) => handleLanguageChange(e.target.value)}
           className='langauges'
@@ -365,7 +365,7 @@ const Editor = () => {
           <option value='68'>PHP</option>
         </select>
         <span>  </span>
-        <span> Theme :  </span>
+        <span className='inspan'> Theme :  </span>
         <select
           onChange={(e) => handleThemeChange(e.target.value)}
           className='themes'
@@ -431,7 +431,7 @@ const Editor = () => {
       />
         <div className='editinput'>
         <div className='flex1'>
-          <span>
+          <span className='inspan'>
             User Input :
           </span>
           <br />
@@ -443,7 +443,7 @@ const Editor = () => {
           />
         </div>
         <div className='mt-2 ml-5'>
-          <span>
+          <span className='inspan'>
             Output :
           </span>
           <br />
@@ -464,16 +464,17 @@ const Editor = () => {
             </button>
             
       </div>
+      <div className='gborder'></div>
       <div className='users'>
         <div>
             <CopyToClipboard text={roomId}
-              onCopy={() => {toast.success("copied to clipboard")}}>
-              <button>Copy RoomId</button>
+              onCopy={() => {toast.success("RoomId copied to clipboard")}}>
+              <button className='copybtn'>Invite</button>
             </CopyToClipboard>
             <button className='bgq' onClick={removeToken}>Log Out</button>
         </div>
         <br></br>
-        <p>users :</p>
+        <p className='inspan'>users :</p>
         <div className='userflex'>
         {clients.map((client) => (
             <Client

@@ -5,6 +5,30 @@
 
 .bgq{
     margin-left: 1rem;
+    border-radius: 6px;
+    color: white;
+    background: #263238;
+    position: relative;
+    cursor: pointer;
+}
+
+
+
+.gborder{
+    /* height: 100%; */
+    border-left: 2px solid #263238;
+}
+
+.copybtn{
+    border-radius: 6px;
+    color: white;
+    background: #263238;
+    position: relative;
+    cursor: pointer;
+}
+
+.editor{
+    margin-top: 0.5rem;
 }
 
 .makeflex{
@@ -20,8 +44,19 @@
 
 .textareas{
     height: 7.5rem;
-    width: 13rem;
+    width: 11rem;
     margin-top: 2rem;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    resize: none;
+}
+
+
+.inspan{
+    font-size: 1.1rem;
 }
 
 
@@ -36,10 +71,8 @@
 }
 
 .userflex{
-
     display: flex;
     flex-wrap: wrap;
-
 }
 
 .inputbox{
@@ -57,5 +90,10 @@
 }
 
 .btn1{
-    margin-left: 3.3rem;
+    margin-left: 2.5rem;
+    color: white;
+    border-radius: 6px;
+    background: #263238;
+    position: relative;
+    cursor: pointer;
 }
