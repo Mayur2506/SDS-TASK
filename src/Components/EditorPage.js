@@ -28,7 +28,8 @@ import io from 'socket.io-client'
 import toast from 'react-hot-toast'
 import "./Editor.css"
 import Client from './Client'
-import Navbar from "./Navbar"
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import Chat from "./Chat"
 
 
 const Editor = () => {
@@ -47,6 +48,7 @@ const Editor = () => {
   const { roomId } = useParams();
   const [state, setState] = useState({
     text: '',
+    font:'14',
     langauge: '54',
     theme: 'monokai',
     input: '',
@@ -99,30 +101,33 @@ const Editor = () => {
 
 
   useEffect(() => {
-    client.emit('join', {
-      roomId,
-      username:rusername,
-    });
-    // const data = { room: room.id, data: state }
-    // console.log('own-data', data)
-    // client.emit('data', data)
-    client.on(
-      'joined',
-      ({ clients, username, prevdata }) => {
-          if (username !== rusername) {
-              toast.success(`${username} joined the room.`);
-              console.log(`${username} joined`);
-          }
-          setClients(clients);
-          if(prevdata !== undefined){
-            setState(prevdata.data);
-          }
-          //     code:state,
-          //     socketId,
-          //     roomId
-          // });
-      }
-    );
+    
+    
+      client.emit('join', {
+        roomId,
+        username:rusername,
+      });
+      // const data = { room: room.id, data: state }
+      // console.log('own-data', data)
+      // client.emit('data', data)
+      client.on(
+        'joined',
+        ({ clients, username, prevdata }) => {
+            if (username !== rusername) {
+                toast.success(`${username} joined the room.`);
+                console.log(`${username} joined`);
+            }
+            setClients(clients);
+            if(prevdata !== undefined){
+              setState(prevdata.data);
+            }
+            //     code:state,
+            //     socketId,
+            //     roomId
+            // });
+        }
+      );
+
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     console.log('here')
@@ -142,14 +147,7 @@ const Editor = () => {
           });
       }
     );
-    // client.on(
-    //   'sync',
-    //   ({prevdata}) => {
-    //       console.log("previous one",prevdata);
-    //       console.log("previous data is",prevdata.data);
-    //       // setState(prevdata.data)
-    //   }
-    // );
+    
     
   })
   
@@ -160,6 +158,7 @@ const Editor = () => {
    
     const newState = {
       text: text,
+      font:state.font,
       langauge: state.langauge,
       theme: state.theme,
       input: state.input,
@@ -180,6 +179,7 @@ const Editor = () => {
   const handleLanguageChange = (langauge) => {
     const newState = {
       text: state.text,
+      font:state.font,
       langauge: langauge,
       theme: state.theme,
       input: state.input,
@@ -196,6 +196,7 @@ const Editor = () => {
   const handleThemeChange = (theme) => {
     const newState = {
       text: state.text,
+      font:state.font,
       langauge: state.langauge,
       theme: theme,
       input: state.input,
@@ -209,9 +210,29 @@ const Editor = () => {
     // console.log('own-data', data)
     client.emit('data', data)
   }
+  
+  const handlefontChange = (font) => {
+    const newState = {
+      text: state.text,
+      font:font,
+      langauge: state.langauge,
+      theme: state.theme,
+      input: state.input,
+      output: state.output,
+    }
+    setState(newState)
+    console.log('state', state)
+    const data = { room: roomId, data: newState }
+    //console.log('data', data)
+    // console.log('own-data', data)
+    client.emit('data', data)
+  }
+
+
   const handleUserInput = (input) => {
     const newState = {
       text: state.text,
+      font:state.font,
       langauge: state.langauge,
       theme: state.theme,
       input: input,
@@ -228,6 +249,7 @@ const Editor = () => {
   const handleCodeOutput = (output) => {
     const newState = {
       text: state.text,
+      font:state.font,
       langauge: state.langauge,
       theme: state.theme,
       input: state.input,
@@ -342,9 +364,32 @@ const Editor = () => {
   map1.set(60, 'golang')
   map1.set(63, 'javascript')
   map1.set(68, 'php')
+  
+  let map2 = new Map()
+
+  map2.set(14, '14px')
+  map2.set(15, '15px')
+  map2.set(16, '16px') 
+  map2.set(17, '17px')
+  map2.set(18, '18px')
+
   return (
     <div className='compiler'>
       <div className='initiate'>
+      <span>fontSize :  </span>
+        <select
+          onChange={(e) => handlefontChange(e.target.value)}
+          className='fontchanges'
+          value={state.font}
+        >
+          <option value='13'>13</option>
+          <option value='14'>14</option>
+          <option value='15'>15</option>
+          <option value='16'>16</option>
+          <option value='17'>17</option>
+          <option value='18'>18</option>
+        </select>
+        <span>  </span>
         <span>Language :  </span>
         <select
           onChange={(e) => handleLanguageChange(e.target.value)}
@@ -358,6 +403,7 @@ const Editor = () => {
           <option value='63'>javascript</option>
           <option value='68'>PHP</option>
         </select>
+        <span>  </span>
         <span> Theme :  </span>
         <select
           onChange={(e) => handleThemeChange(e.target.value)}
@@ -408,7 +454,7 @@ const Editor = () => {
             exec: 'beautify',
           },
         ]}
-        fontSize='15px'
+        fontSize={map2.get(parseInt(state.font))}
         name='UNIQUE_ID_OF_DIV'
         editorProps={{ $blockScrolling: false }}
         style={{
@@ -455,8 +501,16 @@ const Editor = () => {
             >
             Submit
             </button>
+            
       </div>
       <div className='users'>
+        <div>
+            <CopyToClipboard text={roomId}
+              onCopy={() => {toast.success("copied to clipboard")}}>
+              <button>Copy RoomId</button>
+            </CopyToClipboard>
+        </div>
+        <br></br>
         <p>users :</p>
         <div className='userflex'>
         {clients.map((client) => (
@@ -466,6 +520,10 @@ const Editor = () => {
             />
         ))}
         </div>
+          <div>
+          <Chat socket={client} username={rusername} room={roomId} />
+          </div>
+
       </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-// const ACTIONS =require('../src/Components/Actions')
+
 const express = require('express')
 var cors = require('cors')
 const app = express()
@@ -59,6 +59,10 @@ io.on('connection', (socket) => {
         console.log('data', data)
         socket.to(data.room).emit('data', { data: data })
     })
+
+    socket.on("send_message", (data) => {
+        socket.to(data.room).emit("receive_message", data);
+    });
     // socket.on('sync', ({ socketId, code,roomId }) => {
         
     //     const data = { room: roomId, data: code }
