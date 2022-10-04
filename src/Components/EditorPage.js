@@ -31,7 +31,7 @@ import "./Editor.css"
 import Client from './Client'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Chat from "./Chat"
-
+import FileSaver from 'file-saver';
 
 const Editor = () => {
   const navigate = useNavigate();
@@ -160,6 +160,32 @@ const Editor = () => {
     const data = { room:roomId, data: newState }
     client.emit('data', data)
   }
+
+  let map2 = new Map()
+
+  map2.set(54, '.cpp')
+  map2.set(71, '.py')
+  map2.set(62, '.java') 
+  map2.set(60, '.go')
+  map2.set(63, '.js')
+  map2.set(68, '.php')
+
+  const downloadcode = (e) => {
+    e.preventDefault();
+    console.log("downloading");
+    if(state.text === ""){
+      toast.error("no code found");
+    }
+    else{
+        let name=map2.get(parseInt(state.langauge))
+        let text2 = rusername;
+        let result = text2.concat(name);
+        var file = new File([state.text], result, {type: "text/plain;charset=utf-8"});
+        FileSaver.saveAs(file);
+      }
+
+  }
+
   const handleCodeOutput = (output) => {
     const newState = {
       text: state.text,
@@ -268,13 +294,7 @@ const Editor = () => {
   map1.set(63, 'javascript')
   map1.set(68, 'php')
   
-  let map2 = new Map()
-
-  map2.set(14, '14px')
-  map2.set(15, '15px')
-  map2.set(16, '16px') 
-  map2.set(17, '17px')
-  map2.set(18, '18px')
+ 
 
   return (
     <div className='compiler'>
@@ -391,7 +411,9 @@ const Editor = () => {
             >
             Submit
             </button>
-            
+            <div className='filesave'>
+            <button className='btn2' onClick={downloadcode}>Download</button>
+            </div>
       </div>
       <div className='gborder'></div>
       <div className='users'>
