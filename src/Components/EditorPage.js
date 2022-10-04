@@ -238,7 +238,7 @@ const Editor = () => {
         headers: {
           'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
           'x-rapidapi-key':
-            'ceb7f56f31msh830547702c628b7p142b50jsn88f1d5083ecf', 
+            '59b623c4f9msh13c92c11398e2c2p1e327djsn6c27816d32b1', 
           'content-type': 'application/json',
           accept: 'application/json',
         },
@@ -249,13 +249,8 @@ const Editor = () => {
         }),
       }
     )
-    const body = {
-      source_code: state.text,
-      stdin: state.input,
-      language_id: state.langauge,
-    }
-    console.log('body', body)
-    outputText.value += 'Submission Created ...\n'
+    
+    outputText.value = 'Submission Created ...\n'
     handleCodeOutput(outputText.value)
     // state.output = outputText.value
     // setState(state)
@@ -273,8 +268,7 @@ const Editor = () => {
       jsonGetSolution.stderr == null &&
       jsonGetSolution.compile_output == null
     ) {
-      outputText.innerHTML = `Creating Submission ... \nSubmission Created ...\nChecking Submission Status\nstatus : ${jsonGetSolution.status.description}`
-      handleCodeOutput(outputText.value)
+      
       if (jsonResponse.token) {
         let url = `https://judge0-ce.p.rapidapi.com/submissions/${jsonResponse.token}?base64_encoded=true`
 
@@ -283,13 +277,12 @@ const Editor = () => {
           headers: {
             'x-rapidapi-host': 'judge0-ce.p.rapidapi.com',
             'x-rapidapi-key':
-              'ceb7f56f31msh830547702c628b7p142b50jsn88f1d5083ecf',
+              '59b623c4f9msh13c92c11398e2c2p1e327djsn6c27816d32b1',
             'content-type': 'application/json',
           },
         })
-
         jsonGetSolution = await getSolution.json()
-        console.log(jsonGetSolution)
+        console.log("getting solution",jsonGetSolution)
       }
     }
     if (jsonGetSolution.stdout) {
