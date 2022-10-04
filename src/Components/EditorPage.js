@@ -38,7 +38,6 @@ const Editor = () => {
   const location=useLocation();
   const token=localStorage.getItem("token");
   const rusername=location.state?.username;
-  // alert(rusername)
   const options = {
         'force new connection': true,
         reconnectionAttempt: 'Infinity',
@@ -82,15 +81,10 @@ const Editor = () => {
             }
         }
       );
-      // return () => client.disconnect();
-
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
      
-    console.log('here')
     client.on('data', (newState) => {
-      console.log('data', newState)
-      console.log('incoming-text', newState.data.data)
       if (newState.data.data.text !== ' ') setState(newState.data.data)
     })
     client.on('notauth', () => {
@@ -122,16 +116,8 @@ const Editor = () => {
       output: state.output,
     }
     setState(newState)
-    // console.log('state', state)
-    const data = { room: roomId, data: newState }
-    console.log('====================================');
-    console.log("test re",data);
-    console.log('====================================');
-    //console.log('data', data)
-    // console.log('own-data', data)
-    
+    const data = { room: roomId, data: newState } 
     client.emit('data', data)
-    
   }
   const handleLanguageChange = (langauge) => {
     const newState = {
@@ -143,11 +129,7 @@ const Editor = () => {
       output: state.output,
     }
     setState(newState)
-
-    console.log('state', state)
     const data = { room: roomId, data: newState }
-    //console.log('data', data)
-    // console.log('own-data', data)
     client.emit('data', data)
   }
   const handleThemeChange = (theme) => {
@@ -160,31 +142,10 @@ const Editor = () => {
       output: state.output,
     }
     setState(newState)
-
-    console.log('state', state)
     const data = { room: roomId, data: newState }
-    //console.log('data', data)
-    // console.log('own-data', data)
     client.emit('data', data)
   }
   
-  const handlefontChange = (font) => {
-    const newState = {
-      text: state.text,
-      font:font,
-      langauge: state.langauge,
-      theme: state.theme,
-      input: state.input,
-      output: state.output,
-    }
-    setState(newState)
-    console.log('state', state)
-    const data = { room: roomId, data: newState }
-    //console.log('data', data)
-    // console.log('own-data', data)
-    client.emit('data', data)
-  }
-
 
   const handleUserInput = (input) => {
     const newState = {
@@ -196,11 +157,7 @@ const Editor = () => {
       output: state.output,
     }
     setState(newState)
-
-    console.log('state', state)
     const data = { room:roomId, data: newState }
-    //console.log('data', data)
-    // console.log('own-data', data)
     client.emit('data', data)
   }
   const handleCodeOutput = (output) => {
@@ -213,11 +170,7 @@ const Editor = () => {
       output: output,
     }
     setState(newState)
-
-    console.log('state', state)
     const data = { room: roomId, data: newState }
-    //console.log('data', data)
-    // console.log('own-data', data)
     client.emit('data', data)
   }
   const removeToken = () => {
@@ -225,7 +178,6 @@ const Editor = () => {
     navigate('/');
   };
   onsubmit = async (e) => {
-    console.log('state', state)
     e.preventDefault()
     let outputText = document.getElementById('output1')
     outputText.value = ''
@@ -252,11 +204,8 @@ const Editor = () => {
     
     outputText.value = 'Submission Created ...\n'
     handleCodeOutput(outputText.value)
-    // state.output = outputText.value
-    // setState(state)
     const jsonResponse = await response.json()
     console.log('json-response', jsonResponse)
-
     let jsonGetSolution = {
       status: { description: 'Queue' },
       stderr: null,
@@ -330,19 +279,6 @@ const Editor = () => {
   return (
     <div className='compiler'>
       <div className='initiate'>
-      <span className='inspan'>fontSize :  </span>
-        <select
-          onChange={(e) => handlefontChange(e.target.value)}
-          className='fontchanges'
-          value={state.font}
-        >
-          <option value='13'>13</option>
-          <option value='14'>14</option>
-          <option value='15'>15</option>
-          <option value='16'>16</option>
-          <option value='17'>17</option>
-          <option value='18'>18</option>
-        </select>
         <span>  </span>
         <span className='inspan'>Language :  </span>
         <select
@@ -408,7 +344,7 @@ const Editor = () => {
             exec: 'beautify',
           },
         ]}
-        fontSize={map2.get(parseInt(state.font))}
+        fontSize='16px'
         name='UNIQUE_ID_OF_DIV'
         editorProps={{ $blockScrolling: false }}
         style={{

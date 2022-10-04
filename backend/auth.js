@@ -23,7 +23,6 @@ router.post(
       }
       const { email, password, name, username} = req.body;
       const newpassword= await bcrypt.hash(password, 10);
-      console.log(newpassword);
       try {
         let user = await User.findOne({ email });
         if (user) {
