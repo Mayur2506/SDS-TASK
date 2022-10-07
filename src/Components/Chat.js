@@ -42,6 +42,7 @@ function Chat({ socket, username, room }) {
               <div
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
+                key={ Math.floor(Math.random() * (100000 - 0 + 1)) + 0}
               >
                 <div>
                   <div className="message-content">
